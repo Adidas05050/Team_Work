@@ -20,7 +20,7 @@ private:
     uint8_t PositionInChunk;
     DataChunk * GlobalPosition;
 
-    uint64_t ChunksNumber;
+    uint32_t ChunksNumber;
     DataChunk * FirstChunk;
     DataChunk * LastChunk;
 
@@ -39,6 +39,7 @@ public:
 
     void MoveLeft();
     void MoveRight();
+    void ResetPosition();
     void PutSymbol(char Symbol);
 };
 
