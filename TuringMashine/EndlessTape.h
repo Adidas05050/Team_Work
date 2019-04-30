@@ -2,6 +2,8 @@
 #define ENDLESSTAPE_H_INCLUDED
 
 #include <cstdint>
+#include <cstring>
+#include "Program.h"
 
 class EndlessTape
 {
@@ -13,7 +15,7 @@ private:
     {
         char Symbols[SYMBOLS_IN_CHUNK];
 
-        DataChunk(): Symbols{}, PrevChunk(nullptr), NextChunk(nullptr){}
+        DataChunk(): PrevChunk(nullptr), NextChunk(nullptr){memset(Symbols+1, 1, SYMBOLS_IN_CHUNK - 2);}
 
         DataChunk * PrevChunk;
         DataChunk * NextChunk;
@@ -28,6 +30,12 @@ private:
 
     char * StringBuffer;
 
+    void MoveLeft();
+    void MoveRight();
+    void PutSymbol(char Symbol);
+
+    friend bool Program::Execute(EndlessTape & TapeForExecution);
+
 public:
 
     EndlessTape(EndlessTape &) = delete;
@@ -39,10 +47,9 @@ public:
     void operator=(const char * String);
     ~EndlessTape();
 
-    void MoveLeft();
-    void MoveRight();
-    void ResetPosition();
-    void PutSymbol(char Symbol);
+    void ResetPosition(uint8_t NewPosition = 0);
+    char GetCurrentSymbol();
+    const char * GetTapeString();
 };
 
 #endif // ENDLESSTAPE_H_INCLUDED

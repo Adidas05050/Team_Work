@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+class EndlessTape;
+
 class Program
 {
 private:
@@ -18,10 +20,14 @@ private:
     ProgramUnit ** ProgramData;
     uint8_t * StatesEntriesCount;
 
-    char * StatesNames;
+    char ** StatesNames;
+
+    uint16_t CurrentState;
+    char * ErrorString;
+
+    void ClearProgram();
 
 public:
-    enum{LEFT = -1, STAY, RIGHT};
 
     Program(Program &) = delete;
     Program(Program &&) = delete;
@@ -31,17 +37,12 @@ public:
     Program();
     ~Program();
 
-    void InitProgram(uint16_t StatesCount, uint8_t * EntriesCount);
-    bool InitState(const char * StringForCompilation, char ** StringForErrorOutput);
+    bool InitProgram(const char ** ProgramString);
+    void ResetState();
 
-    struct LastExecutionResult
-    {
-        uint8_t ErrorCode;
-        uint8_t TapeMoving;
-        uint16_t NewState;
-    };
+    bool Execute(EndlessTape & TapeForExecution);
 
-    LastExecutionResult ExecuteCommand(uint16_t State, char Key);
+    const char * GetError();
 };
 
 #endif // PROGRAM_H_INCLUDED
