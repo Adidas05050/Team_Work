@@ -1,6 +1,8 @@
 #ifndef ENDLESSTAPE_H_INCLUDED
 #define ENDLESSTAPE_H_INCLUDED
 
+#include <cstdint>
+
 class EndlessTape
 {
 private:

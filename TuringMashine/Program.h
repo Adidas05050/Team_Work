@@ -1,6 +1,8 @@
 #ifndef PROGRAM_H_INCLUDED
 #define PROGRAM_H_INCLUDED
 
+#include <cstdint>
+
 class Program
 {
 private:
@@ -16,6 +18,8 @@ private:
     ProgramUnit ** ProgramData;
     uint8_t * StatesEntriesCount;
 
+    char * StatesNames;
+
 public:
     enum{LEFT = -1, STAY, RIGHT};
 
@@ -28,7 +32,7 @@ public:
     ~Program();
 
     void InitProgram(uint16_t StatesCount, uint8_t * EntriesCount);
-    void InitState(uint16_t State, char Key, char SetTo, uint8_t TapeShift, uint16_t NextState);
+    bool InitState(const char * StringForCompilation, char ** StringForErrorOutput);
 
     struct LastExecutionResult
     {
