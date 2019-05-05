@@ -34,8 +34,8 @@ private:
     uint16_t OutputBufferSize;
     char * StringBuffer;
 
-    uint16_t MoveLeft();
-    uint16_t MoveRight();
+    void MoveLeft();
+    void MoveRight();
     void PutSymbol(char Symbol){(*GlobalPosition)[PositionInChunk] = StringBuffer[StringShift] = Symbol;}
 
     friend bool Program::Execute(EndlessTape & TapeForExecution);
@@ -53,7 +53,9 @@ public:
     EndlessTape & operator=(EndlessTape && MovedTape);
 
     void ResetPosition();
+    char GetCurrentSymbol(){return (*GlobalPosition)[PositionInChunk];}
     bool StringIsInvalid(){return InvalidString;}
+    uint16_t GetStringOffset(){return StringShift;}
     const char * GetTapeString();
 };
 

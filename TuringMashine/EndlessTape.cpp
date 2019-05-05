@@ -1,7 +1,7 @@
 #include "EndlessTape.h"
 #include <cstring>
 
-uint16_t EndlessTape::MoveLeft()
+void EndlessTape::MoveLeft()
 {
     if(PositionInChunk == 0)
     {
@@ -23,11 +23,9 @@ uint16_t EndlessTape::MoveLeft()
         InvalidString = true;
     else
         StringShift--;
-
-    return StringShift;
 }
 
-uint16_t EndlessTape::MoveRight()
+void EndlessTape::MoveRight()
 {
     if(PositionInChunk == SYMBOLS_IN_CHUNK - 1)
     {
@@ -49,8 +47,6 @@ uint16_t EndlessTape::MoveRight()
         InvalidString = true;
     else
         StringShift++;
-
-    return StringShift;
 }
 
 EndlessTape::EndlessTape(uint8_t OutputBufferLength)
@@ -64,7 +60,7 @@ EndlessTape::EndlessTape(uint8_t OutputBufferLength)
 
     InvalidString = true;
     OutputBufferSize = (OutputBufferLength + 2)*SYMBOLS_IN_CHUNK;
-    StringBuffer = new char[OutputBufferSize]{};
+    StringBuffer = new char[OutputBufferSize + 1]{};
 }
 
 void EndlessTape::operator=(const char * String)
@@ -130,7 +126,7 @@ EndlessTape & EndlessTape::operator=(EndlessTape & CopiedTape)
 
     InvalidString = true;
     OutputBufferSize = CopiedTape.OutputBufferSize;
-    StringBuffer = new char[OutputBufferSize]{};
+    StringBuffer = new char[OutputBufferSize + 1]{};
 
     return *this;
 }
@@ -193,6 +189,8 @@ const char * EndlessTape::GetTapeString()
 
     if(CurrentChunk)
         strncpy(StringBuffer + PositionInString, CurrentChunk->Symbols, OutputBufferSize - PositionInString);
+
+    StringBuffer[OutputBufferSize] = '\0';
 
     return StringBuffer;
 }
