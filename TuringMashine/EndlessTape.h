@@ -49,8 +49,8 @@ public:
     void operator=(const char * String);
     ~EndlessTape();
 
-    EndlessTape & operator=(EndlessTape &);
-    EndlessTape & operator=(EndlessTape &&);
+    EndlessTape & operator=(EndlessTape & CopiedTape);
+    EndlessTape & operator=(EndlessTape && MovedTape);
 
     char GetCurrentSymbol(){return (*GlobalPosition)[PositionInChunk];}
     void ResetPosition();
