@@ -30,13 +30,13 @@ private:
     DataChunk * LastChunk;
 
     bool InvalidString;
-    int16_t StringShift;
+    uint16_t StringShift;
     uint16_t OutputBufferSize;
     char * StringBuffer;
 
-    int16_t MoveLeft();
-    int16_t MoveRight();
-    void PutSymbol(char Symbol){(*GlobalPosition)[PositionInChunk] = Symbol;}
+    uint16_t MoveLeft();
+    uint16_t MoveRight();
+    void PutSymbol(char Symbol){(*GlobalPosition)[PositionInChunk] = StringBuffer[StringShift] = Symbol;}
 
     friend bool Program::Execute(EndlessTape & TapeForExecution);
 
@@ -52,7 +52,6 @@ public:
     EndlessTape & operator=(EndlessTape & CopiedTape);
     EndlessTape & operator=(EndlessTape && MovedTape);
 
-    char GetCurrentSymbol(){return (*GlobalPosition)[PositionInChunk];}
     void ResetPosition();
     bool StringIsInvalid(){return InvalidString;}
     const char * GetTapeString();

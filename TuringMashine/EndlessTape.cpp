@@ -1,14 +1,56 @@
 #include "EndlessTape.h"
 #include <cstring>
 
-int16_t EndlessTape::MoveLeft()
+uint16_t EndlessTape::MoveLeft()
 {
+    if(PositionInChunk == 0)
+    {
+        if(!GlobalPosition->PrevChunk)
+        {
+            GlobalPosition->PrevChunk = new DataChunk;
+            GlobalPosition->PrevChunk->NextChunk = GlobalPosition;
+            FirstChunk = GlobalPosition->PrevChunk;
+            ChunksNumber++;
+        }
 
+        GlobalPosition = GlobalPosition->PrevChunk;
+        PositionInChunk = SYMBOLS_IN_CHUNK - 1;
+    }
+    else
+        PositionInChunk--;
+
+    if(StringShift == 0)
+        InvalidString = true;
+    else
+        StringShift--;
+
+    return StringShift;
 }
 
-int16_t EndlessTape::MoveRight()
+uint16_t EndlessTape::MoveRight()
 {
+    if(PositionInChunk == SYMBOLS_IN_CHUNK - 1)
+    {
+        if(!GlobalPosition->NextChunk)
+        {
+            GlobalPosition->NextChunk = new DataChunk;
+            GlobalPosition->NextChunk->PrevChunk = GlobalPosition;
+            LastChunk = GlobalPosition->NextChunk;
+            ChunksNumber++;
+        }
 
+        GlobalPosition = GlobalPosition->NextChunk;
+        PositionInChunk = 0;
+    }
+    else
+        PositionInChunk++;
+
+    if(StringShift == OutputBufferSize - 1)
+        InvalidString = true;
+    else
+        StringShift++;
+
+    return StringShift;
 }
 
 EndlessTape::EndlessTape(uint8_t OutputBufferLength)
@@ -89,6 +131,8 @@ EndlessTape & EndlessTape::operator=(EndlessTape & CopiedTape)
     InvalidString = true;
     OutputBufferSize = CopiedTape.OutputBufferSize;
     StringBuffer = new char[OutputBufferSize]{};
+
+    return *this;
 }
 
 EndlessTape & EndlessTape::operator=(EndlessTape && MovedTape)
@@ -107,6 +151,8 @@ EndlessTape & EndlessTape::operator=(EndlessTape && MovedTape)
     OutputBufferSize = MovedTape.OutputBufferSize;
     StringBuffer = MovedTape.StringBuffer;
     MovedTape.StringBuffer = nullptr;
+
+    return *this;
 }
 
 void EndlessTape::ResetPosition()
@@ -118,5 +164,35 @@ void EndlessTape::ResetPosition()
 
 const char * EndlessTape::GetTapeString()
 {
+    InvalidString = false;
+    memset(StringBuffer, 0, OutputBufferSize);
+    StringShift = OutputBufferSize >> 1;
 
+    DataChunk * CurrentChunk = GlobalPosition;
+    uint16_t PositionInString = StringShift - PositionInChunk + SYMBOLS_IN_CHUNK;
+
+    while(PositionInString > SYMBOLS_IN_CHUNK && CurrentChunk)
+    {
+        PositionInString -= SYMBOLS_IN_CHUNK;
+        strncpy(StringBuffer + PositionInString, CurrentChunk->Symbols, SYMBOLS_IN_CHUNK);
+        CurrentChunk = CurrentChunk->PrevChunk;
+    }
+
+    if(CurrentChunk)
+        strncpy(StringBuffer, CurrentChunk->Symbols + SYMBOLS_IN_CHUNK - PositionInString, PositionInString);
+
+    CurrentChunk = GlobalPosition->NextChunk;
+    PositionInString = StringShift - PositionInChunk + SYMBOLS_IN_CHUNK;
+
+    while(OutputBufferSize - PositionInString > SYMBOLS_IN_CHUNK && CurrentChunk)
+    {
+        strncpy(StringBuffer + PositionInString, CurrentChunk->Symbols, SYMBOLS_IN_CHUNK);
+        PositionInString += SYMBOLS_IN_CHUNK;
+        CurrentChunk = CurrentChunk->NextChunk;
+    }
+
+    if(CurrentChunk)
+        strncpy(StringBuffer + PositionInString, CurrentChunk->Symbols, OutputBufferSize - PositionInString);
+
+    return StringBuffer;
 }
