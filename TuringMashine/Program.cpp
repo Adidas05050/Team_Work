@@ -1,5 +1,6 @@
 #include "Program.h"
 #include "EndlessTape.h"
+#include <cstring>
 
 void Program::ClearProgram()
 {
@@ -47,7 +48,26 @@ bool Program::Execute(EndlessTape & TapeForExecution)
         }
 
     if(KeyNotFinded)
+    {
+        const char * Str1 = "State, named ";
+        const char * Str2 = " has don't have entry for ";
+
+        ErrorString = new char[strlen(Str1) + strlen(StatesNames[CurrentState]) + strlen(Str2) + 2];
+
+        strcpy(ErrorString, Str1);
+
+        size_t ErrorStringShift = strlen(Str1);
+        strcpy(ErrorString + ErrorStringShift, StatesNames[CurrentState]);
+
+        ErrorStringShift += strlen(StatesNames[CurrentState]);
+        strcpy(ErrorString + ErrorStringShift, Str2);
+
+        ErrorStringShift += strlen(Str2);
+        ErrorString[ErrorStringShift] = KeyForCheck;
+        ErrorString[ErrorStringShift+1] = '\0';
+
         return ERROR;
+    }
 
     return SUCCESS;
 }
