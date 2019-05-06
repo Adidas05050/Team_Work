@@ -34,6 +34,7 @@ private:
     uint16_t OutputBufferSize;
     char * StringBuffer;
 
+    void Stay(){}
     void MoveLeft();
     void MoveRight();
     void PutSymbol(char Symbol){(*GlobalPosition)[PositionInChunk] = StringBuffer[StringShift] = Symbol;}
