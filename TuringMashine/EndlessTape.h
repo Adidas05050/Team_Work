@@ -39,6 +39,7 @@ private:
     void MoveRight();
     void PutSymbol(char Symbol){(*GlobalPosition)[PositionInChunk] = StringBuffer[StringShift] = Symbol;}
 
+    friend bool Program::InitProgram(const char ** ProgramString, size_t LinesCount);
     friend bool Program::Execute(EndlessTape & TapeForExecution);
 
 public:
