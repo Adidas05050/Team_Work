@@ -18,11 +18,6 @@ void EndlessTape::MoveLeft()
     }
     else
         PositionInChunk--;
-
-    if(StringShift == 0)
-        InvalidString = true;
-    else
-        StringShift--;
 }
 
 void EndlessTape::MoveRight()
@@ -42,14 +37,9 @@ void EndlessTape::MoveRight()
     }
     else
         PositionInChunk++;
-
-    if(StringShift == OutputBufferSize - 1)
-        InvalidString = true;
-    else
-        StringShift++;
 }
 
-EndlessTape::EndlessTape(uint8_t OutputBufferLength)
+EndlessTape::EndlessTape()
 {
     PositionInChunk = 0;
 
@@ -57,10 +47,6 @@ EndlessTape::EndlessTape(uint8_t OutputBufferLength)
     GlobalPosition = new DataChunk;
     FirstChunk = GlobalPosition;
     LastChunk = GlobalPosition;
-
-    InvalidString = true;
-    OutputBufferSize = (OutputBufferLength + 2)*SYMBOLS_IN_CHUNK;
-    StringBuffer = new char[OutputBufferSize + 1]{};
 }
 
 void EndlessTape::operator=(const char * String)
@@ -88,7 +74,6 @@ void EndlessTape::operator=(const char * String)
     }
     strncpy(CurrentChunk->Symbols, String, StringLength);
     LastChunk = CurrentChunk;
-    InvalidString = true;
 }
 
 EndlessTape::~EndlessTape()
@@ -100,7 +85,6 @@ EndlessTape::~EndlessTape()
         delete FirstChunk;
         FirstChunk = Temp;
     }
-    delete [] StringBuffer;
 }
 
 EndlessTape & EndlessTape::operator=(EndlessTape & CopiedTape)
@@ -124,10 +108,6 @@ EndlessTape & EndlessTape::operator=(EndlessTape & CopiedTape)
     }
     LastChunk = i;
 
-    InvalidString = true;
-    OutputBufferSize = CopiedTape.OutputBufferSize;
-    StringBuffer = new char[OutputBufferSize + 1]{};
-
     return *this;
 }
 
@@ -142,12 +122,6 @@ EndlessTape & EndlessTape::operator=(EndlessTape && MovedTape)
     LastChunk = MovedTape.LastChunk;
     MovedTape.FirstChunk = MovedTape.LastChunk = nullptr;
 
-    InvalidString = MovedTape.InvalidString;
-    StringShift = MovedTape.StringShift;
-    OutputBufferSize = MovedTape.OutputBufferSize;
-    StringBuffer = MovedTape.StringBuffer;
-    MovedTape.StringBuffer = nullptr;
-
     return *this;
 }
 
@@ -155,42 +129,4 @@ void EndlessTape::ResetPosition()
 {
     PositionInChunk = 0;
     GlobalPosition = FirstChunk;
-    InvalidString = true;
-}
-
-const char * EndlessTape::GetTapeString()
-{
-    InvalidString = false;
-    memset(StringBuffer, 0, OutputBufferSize);
-    StringShift = OutputBufferSize >> 1;
-
-    DataChunk * CurrentChunk = GlobalPosition;
-    uint16_t PositionInString = StringShift - PositionInChunk + SYMBOLS_IN_CHUNK;
-
-    while(PositionInString > SYMBOLS_IN_CHUNK && CurrentChunk)
-    {
-        PositionInString -= SYMBOLS_IN_CHUNK;
-        strncpy(StringBuffer + PositionInString, CurrentChunk->Symbols, SYMBOLS_IN_CHUNK);
-        CurrentChunk = CurrentChunk->PrevChunk;
-    }
-
-    if(CurrentChunk)
-        strncpy(StringBuffer, CurrentChunk->Symbols + SYMBOLS_IN_CHUNK - PositionInString, PositionInString);
-
-    CurrentChunk = GlobalPosition->NextChunk;
-    PositionInString = StringShift - PositionInChunk + SYMBOLS_IN_CHUNK;
-
-    while(OutputBufferSize - PositionInString > SYMBOLS_IN_CHUNK && CurrentChunk)
-    {
-        strncpy(StringBuffer + PositionInString, CurrentChunk->Symbols, SYMBOLS_IN_CHUNK);
-        PositionInString += SYMBOLS_IN_CHUNK;
-        CurrentChunk = CurrentChunk->NextChunk;
-    }
-
-    if(CurrentChunk)
-        strncpy(StringBuffer + PositionInString, CurrentChunk->Symbols, OutputBufferSize - PositionInString);
-
-    StringBuffer[OutputBufferSize] = '\0';
-
-    return StringBuffer;
 }

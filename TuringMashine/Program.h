@@ -48,7 +48,7 @@ public:
 
     bool Execute(EndlessTape & TapeForExecution);
 
-    const char * GetError(){return ErrorString;}
+    const char * GetError(){return ErrorString? ErrorString: "Program has not been initialized!";}
 };
 
 #endif // PROGRAM_H_INCLUDED

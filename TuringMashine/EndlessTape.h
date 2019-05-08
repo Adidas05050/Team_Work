@@ -2,7 +2,7 @@
 #define ENDLESSTAPE_H_INCLUDED
 
 #include <cstdint>
-#include "Program.h"
+#include <utility>
 
 class EndlessTape
 {
@@ -29,36 +29,27 @@ private:
     DataChunk * FirstChunk;
     DataChunk * LastChunk;
 
-    bool InvalidString;
-    uint16_t StringShift;
-    uint16_t OutputBufferSize;
-    char * StringBuffer;
-
     void Stay(){}
     void MoveLeft();
     void MoveRight();
-    void PutSymbol(char Symbol){(*GlobalPosition)[PositionInChunk] = StringBuffer[StringShift] = Symbol;}
+    void PutSymbol(char Symbol){(*GlobalPosition)[PositionInChunk] = Symbol;}
 
-    friend bool Program::InitProgram(const char ** ProgramString, size_t LinesCount);
-    friend bool Program::Execute(EndlessTape & TapeForExecution);
+    friend class Program;
 
 public:
 
-    EndlessTape(EndlessTape &) = delete;
-    EndlessTape(EndlessTape &&) = delete;
-
-    EndlessTape(uint8_t OutputBufferLength);
-    void operator=(const char * String);
-    ~EndlessTape();
-
     EndlessTape & operator=(EndlessTape & CopiedTape);
     EndlessTape & operator=(EndlessTape && MovedTape);
+    void operator=(const char * String);
+
+    EndlessTape();
+    EndlessTape(EndlessTape & CopiedTape): EndlessTape(){operator=(CopiedTape);}
+    EndlessTape(EndlessTape && MovedTape): EndlessTape(){operator=(std::move(MovedTape));}
+    EndlessTape(const char * String): EndlessTape(){operator=(String);}
+    ~EndlessTape();
 
     void ResetPosition();
     char GetCurrentSymbol(){return (*GlobalPosition)[PositionInChunk];}
-    bool StringIsInvalid(){return InvalidString;}
-    uint16_t GetStringOffset(){return StringShift;}
-    const char * GetTapeString();
 };
 
 #endif // ENDLESSTAPE_H_INCLUDED
