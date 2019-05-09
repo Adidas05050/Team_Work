@@ -23,7 +23,9 @@ private:
     uint8_t * StatesEntriesCount;
     uint16_t StatesCount;
     char ** StatesNames;
+    enum{HALT = 0xFFFF};
     uint16_t CurrentState;
+    bool Halted;
 
     bool ProgramIsValid;
     char * ErrorString;
@@ -40,15 +42,15 @@ public:
     Program & operator=(Program &) = delete;
     Program & operator=(Program &&) = delete;
 
-    Program(): ProgramData(nullptr), StatesEntriesCount(nullptr), StatesCount(0), StatesNames(nullptr), CurrentState(0), ProgramIsValid(false), ErrorString(nullptr){}
+    Program(): ProgramData(nullptr), StatesEntriesCount(nullptr), StatesCount(0), StatesNames(nullptr), CurrentState(0), Halted(false), ProgramIsValid(false), ErrorString(nullptr){}
     ~Program();
 
     bool InitProgram(const char ** ProgramString, size_t LinesCount);
-    void ResetState(){CurrentState = 0;}
+    void ResetState(){Halted = false, CurrentState = 0;}
 
     bool Execute(EndlessTape & TapeForExecution);
 
-    const char * GetError(){return ErrorString? ErrorString: "Program has not been initialized!";}
+    const char * GetError(){return ErrorString? ErrorString: Halted? "Program has been halted!": "Program has not been initialized!";}
 };
 
 #endif // PROGRAM_H_INCLUDED

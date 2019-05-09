@@ -38,6 +38,7 @@ bool Program::InitProgram(const char ** ProgramString, size_t LinesCount)
     CurrentState = 0;
     StatesCount = 1;
     ProgramIsValid = false;
+    Halted = false;
 
     size_t * LinesNumbers = new size_t[LinesCount];
     for(size_t i = 0; i < LinesCount; i++)
@@ -48,6 +49,8 @@ bool Program::InitProgram(const char ** ProgramString, size_t LinesCount)
     const char * PrevString = ProgramString[0];
     for(size_t i = 1; i < LinesCount; i++)
     {
+        while(ProgramString[i][0] == '\n' || ProgramString[i][0] == ';' || ProgramString[i][0] == ' ')
+            i++;
         if(!WordCmp(PrevString, ProgramString[i]))
         {
             StatesCount++;
@@ -67,6 +70,8 @@ bool Program::InitProgram(const char ** ProgramString, size_t LinesCount)
     PrevString = ProgramString[0];
     for(size_t i = 1, j = 0; i < LinesCount; i++)
     {
+        while(ProgramString[i][0] == '\n' || ProgramString[i][0] == ';' || ProgramString[i][0] == ' ')
+            i++;
         if(!WordCmp(PrevString, ProgramString[i]))
         {
             j++;
@@ -83,6 +88,8 @@ bool Program::InitProgram(const char ** ProgramString, size_t LinesCount)
     for(size_t i = 0, Line = 0, StringShift; i < StatesCount; i++)
     {
         ProgramData[i] = new ProgramUnit[StatesEntriesCount[i]];
+        while(ProgramString[i][0] == '\n' || ProgramString[i][0] == ';' || ProgramString[i][0] == ' ')
+            Line++;
         for(size_t j = 0; j < StatesEntriesCount[i]; j++, Line++)
         {
             StringShift = 0;
@@ -108,12 +115,15 @@ bool Program::InitProgram(const char ** ProgramString, size_t LinesCount)
                     break;
             }
             StringShift += 2;
-            for(size_t k = 0; k < StatesCount; k++)
-                if(WordCmp(ProgramString[Line] + StringShift, StatesNames[k]))
-                {
-                    ProgramData[i][j].NextState = k;
-                    break;
-                }
+            if(strncmp(ProgramString[Line] + StringShift, "halt", 4))
+                ProgramData[i][j].NextState = HALT;
+            else
+                for(size_t k = 0; k < StatesCount; k++)
+                    if(WordCmp(ProgramString[Line] + StringShift, StatesNames[k]))
+                    {
+                        ProgramData[i][j].NextState = k;
+                        break;
+                    }
         }
     }
 
@@ -146,7 +156,7 @@ void Program::Sort(const char ** Strings, size_t n, size_t * Numbers)
 
 bool Program::Execute(EndlessTape & TapeForExecution)
 {
-    if(!ProgramIsValid)
+    if(!ProgramIsValid || Halted)
         return ERROR;
 
     char KeyForCheck = TapeForExecution.GetCurrentSymbol();
@@ -200,6 +210,9 @@ bool Program::Execute(EndlessTape & TapeForExecution)
 
         return ERROR;
     }
+
+    if(CurrentState == HALT)
+        Halted = true;
 
     return SUCCESS;
 }
