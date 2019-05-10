@@ -1,9 +1,13 @@
 #include "mydialog.h"
 #include <QtWidgets>
+#include <cstring>
+
+using namespace std;
 
 CustomPlainText::CustomPlainText(QWidget *parent): QPlainTextEdit(parent)
 {
     lineNumberArea = new LineNumberArea(this);
+
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth()));
@@ -26,21 +30,45 @@ MyDialog::MyDialog(QWidget *parent) : QDialog (parent)
 {
 
     setupUi(this);
-
 }
 
-void MyDialog::on_pushButton_2_clicked()
+
+void MyDialog::on_Start_clicked()
 {
+    string code;
+    string memory;
+    size_t dlina_stroki;
     QFile file("text.txt");
-    file.open(QIODevice::WriteOnly | QIODevice::Text );
-    QString temp = lineEdit_2->text();
+    QTextStream writeStream(&file);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    QString temp = Input->text();
+    Output->setText(temp);
+
     QString to_file = plainTextEdit->toPlainText();
     QStringList strList = to_file.split(QRegExp("[\n]"), QString::SkipEmptyParts);
-    lineEdit->setText(temp);
-    QTextStream writeStream(&file);
+
+    char **MassivChar = new char *[strList.size()];
+    for(int i = 0; strList.at(i) != strList.last(); i++)
+    {
+        memory = strList.at(i).toStdString();
+        dlina_stroki = memory.length();
+        MassivChar[i] = new char[dlina_stroki];
+        strcpy(MassivChar[i], memory.c_str());
+    }
+
+    EndlessTape A;
+    A = temp.toStdString().c_str();
+
+    Program B;
+    B.InitProgram( MassivChar ,strList.size());
 
     writeStream << to_file << endl;
     file.close();
+
+
+
+    delete []MassivChar;
 }
 
 int CustomPlainText::lineNumberAreaWidth()
@@ -93,6 +121,7 @@ void CustomPlainText::highlightCurrentLine()
 
         selection.format.setBackground(lineColor);
         selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+
         selection.cursor = textCursor();
         selection.cursor.clearSelection();
         extraSelections.append(selection);
@@ -101,6 +130,26 @@ void CustomPlainText::highlightCurrentLine()
     setExtraSelections(extraSelections);
 }
 
+void CustomPlainText::highlightErrorLine(int line)
+{
+    QList<QTextEdit::ExtraSelection> extraSelections;
+
+    if (!isReadOnly()) {
+        QTextEdit::ExtraSelection selection;
+
+        QColor lineColor = QColor(Qt::red).lighter(160);
+
+        selection.format.setBackground(lineColor);
+        selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+        selection.cursor.movePosition(QTextCursor::StartOfWord);
+        selection.cursor.setPosition(line);
+        selection.cursor = textCursor();
+        selection.cursor.clearSelection();
+        extraSelections.append(selection);
+    }
+
+    setExtraSelections(extraSelections);
+}
 
 void CustomPlainText::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
@@ -125,3 +174,7 @@ void CustomPlainText::lineNumberAreaPaintEvent(QPaintEvent *event)
         ++blockNumber;
     }
 }
+
+
+
+
