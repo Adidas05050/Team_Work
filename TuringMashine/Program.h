@@ -32,7 +32,7 @@ private:
 
     size_t WordLen(const char * String);
     bool WordCmp(const char * String1, const char * String2);
-    void Sort(const char ** Strings, size_t n, size_t * Numbers);
+    void Sort(char ** Strings, size_t n, size_t * Numbers);
 
 public:
     enum{ERROR = false, SUCCESS = true};
@@ -45,7 +45,7 @@ public:
     Program(): ProgramData(nullptr), StatesEntriesCount(nullptr), StatesCount(0), StatesNames(nullptr), CurrentState(0), Halted(false), ProgramIsValid(false), ErrorString(nullptr){}
     ~Program();
 
-    bool InitProgram(const char ** ProgramString, size_t LinesCount);
+    bool InitProgram(char ** ProgramString, size_t LinesCount);
     void ResetState(){Halted = false, CurrentState = 0;}
 
     bool Execute(EndlessTape & TapeForExecution);

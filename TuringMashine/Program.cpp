@@ -32,7 +32,7 @@ Program::~Program()
     delete [] ErrorString;
 }
 
-bool Program::InitProgram(const char ** ProgramString, size_t LinesCount)
+bool Program::InitProgram(char ** ProgramString, size_t LinesCount)
 {
     this->~Program();
     CurrentState = 0;
@@ -132,10 +132,10 @@ bool Program::InitProgram(const char ** ProgramString, size_t LinesCount)
     return SUCCESS;
 }
 
-void Program::Sort(const char ** Strings, size_t n, size_t * Numbers)
+void Program::Sort(char ** Strings, size_t n, size_t * Numbers)
 {
     const size_t CiuraSteps[9] = {701, 301, 132, 57, 23, 10, 4, 1, 0};
-    const char * Cashe;
+    char * Cashe;
     for(size_t i = 0, d = CiuraSteps[i]; d != 0; d = CiuraSteps[++i])
         for(size_t i = d, j; i < n; i++)
         {
