@@ -46,7 +46,7 @@ public:
     ~Program();
 
     bool InitProgram(char ** ProgramString, size_t LinesCount);
-    void ResetState(){Halted = false, CurrentState = 0;}
+    void ResetState(){Halted = false; CurrentState = 0;}
 
     bool Execute(EndlessTape & TapeForExecution);
 

@@ -1,5 +1,5 @@
-#include "Program.h"
-#include "EndlessTape.h"
+#include "mydialog.h"
+
 
 size_t Program::WordLen(const char * String)
 {
@@ -20,11 +20,14 @@ bool Program::WordCmp(const char * String1, const char * String2)
 
 Program::~Program()
 {
-    for(uint16_t i = 0; i < StatesCount; i++)
-    {
-        delete [] ProgramData[i];
-        delete [] StatesNames[i];
-    }
+    if(ProgramData)
+        for(uint16_t i = 0; i < StatesCount; i++)
+            delete [] ProgramData[i];
+
+    if(StatesNames)
+        for(uint16_t i = 0; i < StatesCount; i++)
+            delete [] StatesNames[i];
+
     delete [] ProgramData;
     delete [] StatesNames;
     delete [] StatesEntriesCount;
