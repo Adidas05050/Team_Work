@@ -49,7 +49,7 @@ public:
     ~EndlessTape();
 
     void ResetPosition();
-    char GetCurrentSymbol(){return (*GlobalPosition)[PositionInChunk];}
+    const char * GetCurrentSymbol(){return &(*GlobalPosition)[PositionInChunk];}
 };
 
 #endif // ENDLESSTAPE_H_INCLUDED
