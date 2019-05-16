@@ -1,5 +1,6 @@
-#include "EndlessTape.h"
+#include "mydialog.h"
 #include <cstring>
+#include "Program.h"
 
 void EndlessTape::MoveLeft()
 {

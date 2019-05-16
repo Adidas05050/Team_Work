@@ -132,6 +132,8 @@ bool Program::InitProgram(char ** ProgramString, size_t LinesCount)
 
     delete [] LinesNumbers;
 
+    ProgramIsValid = true;
+
     return SUCCESS;
 }
 
@@ -162,7 +164,7 @@ bool Program::Execute(EndlessTape & TapeForExecution)
     if(!ProgramIsValid || Halted)
         return ERROR;
 
-    char KeyForCheck = TapeForExecution.GetCurrentSymbol();
+    char KeyForCheck = *TapeForExecution.GetCurrentSymbol();
 
     bool KeyNotFinded = true;
     int16_t UniversalKey = -1;
