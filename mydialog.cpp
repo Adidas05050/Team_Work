@@ -1,8 +1,8 @@
 #include "mydialog.h"
 #include <QtWidgets>
-#include <cstring>
 
-using namespace std;
+
+
 
 CustomPlainText::CustomPlainText(QWidget *parent): QPlainTextEdit(parent)
 {
@@ -35,9 +35,6 @@ MyDialog::MyDialog(QWidget *parent) : QDialog (parent)
 
 void MyDialog::on_Start_clicked()
 {
-    string code;
-    string memory;
-    size_t dlina_stroki;
     QFile file("text.txt");
     QTextStream writeStream(&file);
     file.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -47,6 +44,12 @@ void MyDialog::on_Start_clicked()
 
     QString to_file = plainTextEdit->toPlainText();
     QStringList strList = to_file.split(QRegExp("[\n]"), QString::SkipEmptyParts);
+    writeStream << to_file << endl;
+    file.close();
+
+    string code;
+    string memory;
+    size_t dlina_stroki;
 
     int ListSize = strList.size();
     char **MassivChar = new char *[ListSize];
@@ -57,22 +60,45 @@ void MyDialog::on_Start_clicked()
         MassivChar[i] = new char[dlina_stroki];
         strcpy(MassivChar[i], memory.c_str());
     }
+    int x = 0;
+    EndlessTape Tape;
+    Program program;
+    const char * CurrentBukva;
+    program.InitProgram( MassivChar , ListSize );
+    Tape = temp.toStdString().c_str();
+    ErrorButton->setText("Error");
+    while(!program.IsHalted())
+    {
 
-    EndlessTape A;
-    A = temp.toStdString().c_str();
+        CurrentBukva = Tape.GetCurrentSymbol();
+        if(!program.Execute(Tape))
+        {
+            ErrorButton->setText("MineCrash");
+            break;
+        }
+        if(x < 0)
+        {
+            temp.prepend(*CurrentBukva);
+            x = 0;
+        }
+        else if(x > temp.size())
+        {
+            temp.append(*CurrentBukva);
+        }
+        else
+            temp[x] = (*CurrentBukva);
 
-
-    Program B;
-    B.InitProgram( MassivChar ,ListSize);
-    const char * CurrentBukva = A.GetCurrentSymbol();
-    B.Execute(A);
-    temp = B.GetError();
-    temp.prepend(*CurrentBukva);
-
-    writeStream << to_file << endl;
-    file.close();
-
-    Output->setText(temp);
+       /* if(Tape.GetLastShift() == EndlessTape::LEFT)
+            x--;
+        else if(Tape.GetLastShift() == EndlessTape::NONE)
+            x += 0;
+        else
+            x++;
+        */
+        x += Tape.GetLastShift();
+        Output->setText(temp);
+        ErrorButton->setText(QString::number(x));
+    }
 
     for(int i = 0; i < strList.size(); i++)
         delete [] MassivChar[i];

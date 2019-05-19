@@ -3,8 +3,8 @@
 
 #include "customplaintext.h"
 #include "ui_mydialog.h"
-#include "TuringMashine/EndlessTape.h"
-#include "TuringMashine/Program.h"
+#include "EndlessTape.h"
+#include "Program.h"
 #include <QFile>
 #include <QString>
 #include <QTextStream>
@@ -16,6 +16,9 @@
 #include <QList>
 #include <QAbstractScrollArea>
 #include <fstream>
+#include <cstring>
+
+using namespace std;
 
 class MyDialog : public QDialog, public Ui::Dialog
 {
