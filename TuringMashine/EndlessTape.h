@@ -29,7 +29,7 @@ private:
     DataChunk * FirstChunk;
     DataChunk * LastChunk;
 
-    uint8_t LastShift;
+    int8_t LastShift;
     void Stay(){LastShift = NONE;}
     void MoveLeft();
     void MoveRight();
@@ -38,7 +38,7 @@ private:
     friend class Program;
 
 public:
-    enum{LEFT = -1, NONE, RIGHT};
+    enum Shift: int8_t{LEFT = -1, NONE, RIGHT};
 
     EndlessTape & operator=(EndlessTape & CopiedTape);
     EndlessTape & operator=(EndlessTape && MovedTape);
@@ -52,7 +52,7 @@ public:
 
     void ResetPosition();
     const char * GetCurrentSymbol(){return &(*GlobalPosition)[PositionInChunk];}
-    uint8_t GetLastShift(){return LastShift;};
+    int8_t GetLastShift(){return LastShift;}
 };
 
 #endif // ENDLESSTAPE_H_INCLUDED
