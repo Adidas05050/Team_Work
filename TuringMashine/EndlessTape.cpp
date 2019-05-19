@@ -19,6 +19,7 @@ void EndlessTape::MoveLeft()
     }
     else
         PositionInChunk--;
+    LastShift = LEFT;
 }
 
 void EndlessTape::MoveRight()
@@ -38,11 +39,13 @@ void EndlessTape::MoveRight()
     }
     else
         PositionInChunk++;
+    LastShift = RIGHT;
 }
 
 EndlessTape::EndlessTape()
 {
     PositionInChunk = 0;
+    LastShift = NONE;
 
     ChunksNumber = 1;
     GlobalPosition = new DataChunk;
@@ -130,4 +133,5 @@ void EndlessTape::ResetPosition()
 {
     PositionInChunk = 0;
     GlobalPosition = FirstChunk;
+    LastShift = NONE;
 }
