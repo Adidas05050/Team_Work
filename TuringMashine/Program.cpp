@@ -63,7 +63,6 @@ bool Program::InitProgram(char ** ProgramString, size_t LinesCount)
 
     StatesEntriesCount = new uint8_t[StatesCount]{};
     StatesEntriesCount[0]++;
-
     size_t WordSize = WordLen(ProgramString[0]);
     StatesNames = new char *[StatesCount];
     StatesNames[0] = new char[WordSize + 1];
@@ -118,11 +117,11 @@ bool Program::InitProgram(char ** ProgramString, size_t LinesCount)
                     break;
             }
             StringShift += 2;
-            if(strncmp(ProgramString[Line] + StringShift, "halt", 4))
+            if(!strncmp(ProgramString[Line] + StringShift, "halt", 4))
                 ProgramData[i][j].NextState = HALT;
             else
                 for(size_t k = 0; k < StatesCount; k++)
-                    if(WordCmp(ProgramString[Line] + StringShift, StatesNames[k]))
+                    if(!strcmp(ProgramString[Line] + StringShift, StatesNames[k]))
                     {
                         ProgramData[i][j].NextState = k;
                         break;
@@ -166,35 +165,28 @@ bool Program::Execute(EndlessTape & TapeForExecution)
 
     char KeyForCheck = *TapeForExecution.GetCurrentSymbol();
 
-    bool KeyNotFinded = true;
-    int16_t UniversalKey = -1;
+    int16_t KeyFinded = -1;
     for(uint8_t i = 0; i < StatesEntriesCount[CurrentState]; i++)
     {
         if(ProgramData[CurrentState][i].Key == KeyForCheck)
         {
-            KeyNotFinded = false;
-            if(ProgramData[CurrentState][i].SetTo != '*')
-                TapeForExecution.PutSymbol(ProgramData[CurrentState][i].SetTo);
-            (TapeForExecution.*ProgramData[CurrentState][i].TapeMove)();
-            CurrentState = ProgramData[CurrentState][i].NextState;
+            KeyFinded = i;
             break;
         }
-        if(ProgramData[CurrentState][i].Key == '*')
-        {
-            KeyNotFinded = false;
-            UniversalKey = i;
-        }
+        else
+            if(ProgramData[CurrentState][i].Key == '*')
+                KeyFinded = i;
+
     }
 
-    if(UniversalKey > -1)
+    if(KeyFinded >= 0)
     {
-        if(ProgramData[CurrentState][UniversalKey].SetTo != '*')
-            TapeForExecution.PutSymbol(ProgramData[CurrentState][UniversalKey].SetTo);
-        (TapeForExecution.*ProgramData[CurrentState][UniversalKey].TapeMove)();
-        CurrentState = ProgramData[CurrentState][UniversalKey].NextState;
+        if(ProgramData[CurrentState][KeyFinded].SetTo != '*')
+            TapeForExecution.PutSymbol(ProgramData[CurrentState][KeyFinded].SetTo);
+        (TapeForExecution.*ProgramData[CurrentState][KeyFinded].TapeMove)();
+        CurrentState = ProgramData[CurrentState][KeyFinded].NextState;
     }
-
-    if(KeyNotFinded)
+    else
     {
         const char * Str1 = "State, named ";
         const char * Str2 = " has don't have entry for ";

@@ -25,16 +25,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        EndlessTape.cpp \
-        Program.cpp \
-        main.cpp \
-        mydialog.cpp
+    TuringMashine/*.cpp \
+    customplaintext.cpp \
+    main.cpp \
+    mydialog.cpp
 
 HEADERS += \
-    EndlessTape.h \
-    Program.h \
-    customplaintext.h \
-    mydialog.h
+    TuringMashine/*.h \
+    *.h
 
 FORMS += \
     mydialog.ui

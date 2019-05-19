@@ -50,7 +50,7 @@ public:
 
     bool Execute(EndlessTape & TapeForExecution);
 
-    const char * GetError(){return ErrorString? ErrorString: Halted? "Program has been halted!": "Program has not been initialized!";}
+    const char * GetError(){return ErrorString? ErrorString: ProgramIsValid? Halted? "Program has been halted!": "All is good.": "Program has not been initialized!";}
 };
 
 #endif // PROGRAM_H_INCLUDED
