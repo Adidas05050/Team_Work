@@ -73,7 +73,8 @@ void MyDialog::on_Start_clicked()
         CurrentBukva = Tape.GetCurrentSymbol();
         if(!program.Execute(Tape))
         {
-            ErrorButton->setText("MineCrash");
+            Output->setText(program.GetError());
+            ErrorButton->setText("MineCrush");
             break;
         }
         if(x < 0)
@@ -97,7 +98,6 @@ void MyDialog::on_Start_clicked()
         */
         x += Tape.GetLastShift();
         Output->setText(temp);
-        ErrorButton->setText(QString::number(x));
     }
 
     for(int i = 0; i < strList.size(); i++)

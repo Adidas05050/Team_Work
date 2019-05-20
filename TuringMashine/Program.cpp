@@ -49,11 +49,13 @@ bool Program::InitProgram(char ** ProgramString, size_t LinesCount)
 
     Sort(ProgramString, LinesCount, LinesNumbers);
 
-    const char * PrevString = ProgramString[0];
-    for(size_t i = 1; i < LinesCount; i++)
+    size_t ValidStringsShift = 0;
+    while(ProgramString[ValidStringsShift][0] == '\t' || ProgramString[ValidStringsShift][0] == ' ' || ProgramString[ValidStringsShift][0] == '\n' || ProgramString[ValidStringsShift][0] == ';')
+        ValidStringsShift++;
+
+    const char * PrevString = ProgramString[ValidStringsShift];
+    for(size_t i = 1 + ValidStringsShift; i < LinesCount; i++)
     {
-        while(ProgramString[i][0] == '\n' || ProgramString[i][0] == ';' || ProgramString[i][0] == ' ')
-            i++;
         if(!WordCmp(PrevString, ProgramString[i]))
         {
             StatesCount++;
@@ -62,18 +64,16 @@ bool Program::InitProgram(char ** ProgramString, size_t LinesCount)
     }
 
     StatesEntriesCount = new uint8_t[StatesCount]{};
-    StatesEntriesCount[0]++;
-    size_t WordSize = WordLen(ProgramString[0]);
+    StatesEntriesCount[ValidStringsShift]++;
+    size_t WordSize = WordLen(ProgramString[ValidStringsShift]);
     StatesNames = new char *[StatesCount];
-    StatesNames[0] = new char[WordSize + 1];
-    strncpy(StatesNames[0], ProgramString[0], WordSize);
-    StatesNames[0][WordSize] = '\0';
+    StatesNames[ValidStringsShift] = new char[WordSize + 1];
+    strncpy(StatesNames[0], ProgramString[ValidStringsShift], WordSize);
+    StatesNames[ValidStringsShift][WordSize] = '\0';
 
     PrevString = ProgramString[0];
-    for(size_t i = 1, j = 0; i < LinesCount; i++)
+    for(size_t i = 1 + ValidStringsShift, j = 0; i < LinesCount; i++)
     {
-        while(ProgramString[i][0] == '\n' || ProgramString[i][0] == ';' || ProgramString[i][0] == ' ')
-            i++;
         if(!WordCmp(PrevString, ProgramString[i]))
         {
             j++;
@@ -87,18 +87,16 @@ bool Program::InitProgram(char ** ProgramString, size_t LinesCount)
     }
 
     ProgramData = new ProgramUnit *[StatesCount];
-    for(size_t i = 0, Line = 0, StringShift; i < StatesCount; i++)
+    for(size_t i = 0, Line = ValidStringsShift, StringShift; i < StatesCount; i++)
     {
         ProgramData[i] = new ProgramUnit[StatesEntriesCount[i]];
-        while(ProgramString[i][0] == '\n' || ProgramString[i][0] == ';' || ProgramString[i][0] == ' ')
-            Line++;
         for(size_t j = 0; j < StatesEntriesCount[i]; j++, Line++)
         {
             StringShift = 0;
-            StringShift += WordLen(ProgramString[Line]) + 1;
-            ProgramData[i][j].Key = ProgramString[Line][StringShift];
+            StringShift += WordLen(ProgramString[Line] + StringShift) + 1;
+            ProgramData[i][j].Key = ProgramString[Line][StringShift] == '_'? 0: ProgramString[Line][StringShift];
             StringShift += 2;
-            ProgramData[i][j].SetTo = ProgramString[Line][StringShift];
+            ProgramData[i][j].SetTo = ProgramString[Line][StringShift] == '_'? 0: ProgramString[Line][StringShift];
             StringShift += 2;
             switch(ProgramString[Line][StringShift])
             {
@@ -164,6 +162,8 @@ bool Program::Execute(EndlessTape & TapeForExecution)
         return ERROR;
 
     char KeyForCheck = *TapeForExecution.GetCurrentSymbol();
+    if(KeyForCheck == ' ')
+        KeyForCheck = 0;
 
     int16_t KeyFinded = -1;
     for(uint8_t i = 0; i < StatesEntriesCount[CurrentState]; i++)
@@ -179,7 +179,7 @@ bool Program::Execute(EndlessTape & TapeForExecution)
 
     }
 
-    if(KeyFinded >= 0)
+    if(KeyFinded > -1)
     {
         if(ProgramData[CurrentState][KeyFinded].SetTo != '*')
             TapeForExecution.PutSymbol(ProgramData[CurrentState][KeyFinded].SetTo);
@@ -202,7 +202,7 @@ bool Program::Execute(EndlessTape & TapeForExecution)
         strcpy(ErrorString + ErrorStringShift, Str2);
 
         ErrorStringShift += strlen(Str2);
-        ErrorString[ErrorStringShift] = KeyForCheck;
+        ErrorString[ErrorStringShift] = KeyForCheck? KeyForCheck: '_';
         ErrorString[ErrorStringShift+1] = '\0';
 
         return ERROR;
