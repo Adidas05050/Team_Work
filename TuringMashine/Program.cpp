@@ -34,7 +34,19 @@ Program::~Program()
 
     delete [] ErrorString;
 }
-
+/*
+static size_t itos(uint32_t Num, char * Str)
+{
+    uint64_t NumCpy = Num, Numl = 1;
+    while(NumCpy /= 10)
+        Numl++;
+    Str[Numl--] = '\0';
+    do
+        Str[Numl--] = Num % 10 + 48;
+    while(Num /= 10);
+    return strlen(Str);
+}
+*/
 bool Program::InitProgram(char ** ProgramString, size_t LinesCount)
 {
     this->~Program();
@@ -47,14 +59,19 @@ bool Program::InitProgram(char ** ProgramString, size_t LinesCount)
     for(size_t i = 0; i < LinesCount; i++)
         LinesNumbers[i] = i + 1;
 
+    for(size_t i = 0; i < LinesCount; i++)
+        while(ProgramString[i][0] == ' ' || ProgramString[i][0] == '\t')ProgramString[i]++;
+
     Sort(ProgramString, LinesCount, LinesNumbers);
 
-    size_t ValidStringsShift = 0;
-    while(ProgramString[ValidStringsShift][0] == '\t' || ProgramString[ValidStringsShift][0] == ' ' || ProgramString[ValidStringsShift][0] == '\n' || ProgramString[ValidStringsShift][0] == ';')
-        ValidStringsShift++;
+    while(ProgramString[0][0] == '\n' || ProgramString[0][0] == ';')
+    {
+        ProgramString++;
+        LinesCount--;
+    }
 
-    const char * PrevString = ProgramString[ValidStringsShift];
-    for(size_t i = 1 + ValidStringsShift; i < LinesCount; i++)
+    const char * PrevString = ProgramString[0];
+    for(size_t i = 1; i < LinesCount; i++)
     {
         if(!WordCmp(PrevString, ProgramString[i]))
         {
@@ -64,15 +81,15 @@ bool Program::InitProgram(char ** ProgramString, size_t LinesCount)
     }
 
     StatesEntriesCount = new uint8_t[StatesCount]{};
-    StatesEntriesCount[ValidStringsShift]++;
-    size_t WordSize = WordLen(ProgramString[ValidStringsShift]);
+    StatesEntriesCount[0]++;
+    size_t WordSize = WordLen(ProgramString[0]);
     StatesNames = new char *[StatesCount];
-    StatesNames[ValidStringsShift] = new char[WordSize + 1];
-    strncpy(StatesNames[0], ProgramString[ValidStringsShift], WordSize);
-    StatesNames[ValidStringsShift][WordSize] = '\0';
+    StatesNames[0] = new char[WordSize + 1];
+    strncpy(StatesNames[0], ProgramString[0], WordSize);
+    StatesNames[0][WordSize] = '\0';
 
     PrevString = ProgramString[0];
-    for(size_t i = 1 + ValidStringsShift, j = 0; i < LinesCount; i++)
+    for(size_t i = 1, j = 0; i < LinesCount; i++)
     {
         if(!WordCmp(PrevString, ProgramString[i]))
         {
@@ -87,7 +104,8 @@ bool Program::InitProgram(char ** ProgramString, size_t LinesCount)
     }
 
     ProgramData = new ProgramUnit *[StatesCount];
-    for(size_t i = 0, Line = ValidStringsShift, StringShift; i < StatesCount; i++)
+    bool HaltFinded = false;
+    for(size_t i = 0, Line = 0, StringShift; i < StatesCount; i++)
     {
         ProgramData[i] = new ProgramUnit[StatesEntriesCount[i]];
         for(size_t j = 0; j < StatesEntriesCount[i]; j++, Line++)
@@ -116,7 +134,10 @@ bool Program::InitProgram(char ** ProgramString, size_t LinesCount)
             }
             StringShift += 2;
             if(!strncmp(ProgramString[Line] + StringShift, "halt", 4))
+            {
+                HaltFinded = true;
                 ProgramData[i][j].NextState = HALT;
+            }
             else
                 for(size_t k = 0; k < StatesCount; k++)
                     if(!strcmp(ProgramString[Line] + StringShift, StatesNames[k]))
@@ -125,6 +146,13 @@ bool Program::InitProgram(char ** ProgramString, size_t LinesCount)
                         break;
                     }
         }
+    }
+    if(!HaltFinded)
+    {
+        const char * ErrorStr = "Syntax error. Halt state was not found";
+        ErrorString = new char[strlen(ErrorStr)];
+        strcpy(ErrorString, ErrorStr);
+        return ERROR;
     }
 
     delete [] LinesNumbers;
@@ -188,20 +216,20 @@ bool Program::Execute(EndlessTape & TapeForExecution)
     }
     else
     {
-        const char * Str1 = "State, named ";
-        const char * Str2 = " has don't have entry for ";
+        const char * ErrorStr1 = "State, named ";
+        const char * ErrorStr2 = " has don't have entry for ";
 
-        ErrorString = new char[strlen(Str1) + strlen(StatesNames[CurrentState]) + strlen(Str2) + 2];
+        ErrorString = new char[strlen(ErrorStr1) + strlen(StatesNames[CurrentState]) + strlen(ErrorStr2) + 2];
 
-        strcpy(ErrorString, Str1);
+        strcpy(ErrorString, ErrorStr1);
 
-        size_t ErrorStringShift = strlen(Str1);
+        size_t ErrorStringShift = strlen(ErrorStr1);
         strcpy(ErrorString + ErrorStringShift, StatesNames[CurrentState]);
 
         ErrorStringShift += strlen(StatesNames[CurrentState]);
-        strcpy(ErrorString + ErrorStringShift, Str2);
+        strcpy(ErrorString + ErrorStringShift, ErrorStr2);
 
-        ErrorStringShift += strlen(Str2);
+        ErrorStringShift += strlen(ErrorStr2);
         ErrorString[ErrorStringShift] = KeyForCheck? KeyForCheck: '_';
         ErrorString[ErrorStringShift+1] = '\0';
 
