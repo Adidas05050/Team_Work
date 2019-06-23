@@ -43,7 +43,7 @@ void MyDialog::on_Start_clicked()
     Output->setText(temp);
 
     QString to_file = plainTextEdit->toPlainText();
-    QStringList strList = to_file.split(QRegExp("[\n]"), QString::SkipEmptyParts);
+    QStringList strList = to_file.split(QRegExp("[\n]"));
     writeStream << to_file << endl;
     file.close();
 
@@ -57,14 +57,27 @@ void MyDialog::on_Start_clicked()
     {
         memory = strList.at(i).toStdString();
         dlina_stroki = memory.length();
-        MassivChar[i] = new char[dlina_stroki];
+        MassivChar[i] = new char[dlina_stroki + 1];
         strcpy(MassivChar[i], memory.c_str());
+        MassivChar[i][dlina_stroki] = '\0';
     }
     int x = 0;
     EndlessTape Tape;
     Program program;
     const char * CurrentBukva;
-    program.InitProgram( MassivChar , ListSize );
+
+    if(!program.InitProgram( MassivChar , ListSize ))
+    {
+        Output->setText(program.GetError());
+        ErrorButton->setText("MineCrush");
+
+        for(int i = 0; i < ListSize; i++)
+            delete [] MassivChar[i];
+
+        delete []MassivChar;
+
+        return;
+    }
     Tape = temp.toStdString().c_str();
     ErrorButton->setText("Error");
     while(!program.IsHalted())
@@ -89,21 +102,9 @@ void MyDialog::on_Start_clicked()
         else
             temp[x] = (*CurrentBukva);
 
-       /* if(Tape.GetLastShift() == EndlessTape::LEFT)
-            x--;
-        else if(Tape.GetLastShift() == EndlessTape::NONE)
-            x += 0;
-        else
-            x++;
-        */
         x += Tape.GetLastShift();
         Output->setText(temp);
     }
-
-    for(int i = 0; i < strList.size(); i++)
-        delete [] MassivChar[i];
-
-    delete []MassivChar;
 }
 
 int CustomPlainText::lineNumberAreaWidth()
