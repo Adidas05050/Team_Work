@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>581</width>
-    <height>470</height>
+    <height>516</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,9 @@
   <widget class="QPushButton" name="Close">
    <property name="geometry">
     <rect>
-     <x>490</x>
-     <y>270</y>
-     <width>80</width>
+     <x>390</x>
+     <y>430</y>
+     <width>171</width>
      <height>21</height>
     </rect>
    </property>
@@ -39,9 +39,9 @@
   <widget class="QPushButton" name="Start">
    <property name="geometry">
     <rect>
-     <x>430</x>
-     <y>80</y>
-     <width>80</width>
+     <x>400</x>
+     <y>140</y>
+     <width>171</width>
      <height>21</height>
     </rect>
    </property>
@@ -78,26 +78,131 @@
    <property name="geometry">
     <rect>
      <x>400</x>
-     <y>120</y>
-     <width>161</width>
+     <y>80</y>
+     <width>171</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="inputMask">
+    <string/>
+   </property>
+   <property name="text">
+    <string notr="true"/>
+   </property>
+   <property name="placeholderText">
+    <string>Ввод данных:</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="ErrorLine">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>480</y>
+     <width>531</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>460</y>
+     <width>141</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Информация выполнения:</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="FullSpeed">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>110</y>
+     <width>171</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string/>
+    <string>Полная скорость выполнения</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="ErrorButton">
+  <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>430</x>
-     <y>370</y>
-     <width>111</width>
-     <height>81</height>
+     <x>30</x>
+     <y>10</y>
+     <width>201</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Error</string>
+    <string>Результат выполнения:</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Pause">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>490</x>
+     <y>170</y>
+     <width>80</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Пауза</string>
+   </property>
+   <property name="autoDefault">
+    <bool>true</bool>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Reset">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>170</y>
+     <width>80</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Сбросить</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Step">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>200</y>
+     <width>171</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Шаг</string>
    </property>
   </widget>
  </widget>

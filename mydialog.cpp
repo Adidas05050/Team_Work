@@ -1,8 +1,110 @@
 #include "mydialog.h"
 #include <QtWidgets>
 
+int ActivFase = 0; // 0 - first, 1 - next, 2 - pause, 3 -step
+bool b_FullSpeed = false;
+bool b_Reset = false;
+void MyDialog::Proccess()
+{
+    Start->setEnabled(false);
+    QFile file("text.txt");
+    QTextStream writeStream(&file);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
 
+    QString temp = Input->text();
+    Output->setText(temp);
 
+    QString to_file = plainTextEdit->toPlainText();
+    QStringList strList = to_file.split(QRegExp("[\n]"));
+    writeStream << to_file << endl;
+    file.close();// first stade
+
+    string code;
+    string memory;
+    size_t dlina_stroki;
+
+    int ListSize = strList.size();
+    char **MassivChar = new char *[ListSize];
+    for(int i = 0; i < ListSize; i++)
+    {
+        memory = strList.at(i).toStdString();
+        dlina_stroki = memory.length();
+        MassivChar[i] = new char[dlina_stroki + 1];
+        strcpy(MassivChar[i], memory.c_str());
+        MassivChar[i][dlina_stroki] = '\0';
+    }
+    //second stade
+    int x = 0;
+    EndlessTape Tape;
+    Program program;
+    const char * CurrentBukva;
+
+    if(!program.InitProgram( MassivChar , ListSize ))
+    {
+        ErrorLine->setText(program.GetError());
+
+        for(int i = 0; i < ListSize; i++)
+            delete [] MassivChar[i];
+
+        delete []MassivChar;
+
+        return;
+    }
+    Tape = temp.toStdString().c_str();
+    while(!program.IsHalted())
+    {
+        while(ActivFase == 2)
+        {
+            QEventLoop loop;
+            QTimer timer;
+            timer.setInterval(100);
+            connect (&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+            timer.start();
+            loop.exec();
+            if(b_Reset)
+                return;
+        }
+        if(!b_FullSpeed)
+        {
+            QEventLoop loop;
+            QTimer timer;
+            timer.setInterval(300);
+            connect (&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+            timer.start();
+            loop.exec();
+        }
+        if(b_Reset)
+            return;
+        CurrentBukva = Tape.GetCurrentSymbol();
+        if(!program.Execute(Tape))
+        {
+            ErrorLine->setText(program.GetError());
+            break;
+        }
+        if(x < 0)
+        {
+            temp.prepend(*CurrentBukva);
+            x = 0;
+        }
+        else if(x > temp.size())
+        {
+            temp.append(*CurrentBukva);
+        }
+        else
+            temp[x] = (*CurrentBukva);
+
+        x += Tape.GetLastShift();
+        Output->setText(temp);
+        Output->setSelection(x,1);
+        if(ActivFase == 3)
+            ActivFase = 2;
+    }
+    if(program.IsHalted())
+    {
+        Pause->setEnabled(false);
+        Start->setEnabled(false);
+    }
+}
 
 CustomPlainText::CustomPlainText(QWidget *parent): QPlainTextEdit(parent)
 {
@@ -30,80 +132,27 @@ MyDialog::MyDialog(QWidget *parent) : QDialog (parent)
 {
 
     setupUi(this);
+    Output->setEnabled(false);
+    Output->setStyleSheet("QLineEdit { selection-background-color: rgb(150, 150, 00); }");
 }
 
 
 void MyDialog::on_Start_clicked()
 {
-    QFile file("text.txt");
-    QTextStream writeStream(&file);
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-
-    QString temp = Input->text();
-    Output->setText(temp);
-
-    QString to_file = plainTextEdit->toPlainText();
-    QStringList strList = to_file.split(QRegExp("[\n]"));
-    writeStream << to_file << endl;
-    file.close();
-
-    string code;
-    string memory;
-    size_t dlina_stroki;
-
-    int ListSize = strList.size();
-    char **MassivChar = new char *[ListSize];
-    for(int i = 0; i < ListSize; i++)
+    if(ActivFase == 0)
     {
-        memory = strList.at(i).toStdString();
-        dlina_stroki = memory.length();
-        MassivChar[i] = new char[dlina_stroki + 1];
-        strcpy(MassivChar[i], memory.c_str());
-        MassivChar[i][dlina_stroki] = '\0';
+        ActivFase = 1;
+        Pause->setEnabled(true);
+        b_Reset = false;
+        Proccess();
     }
-    int x = 0;
-    EndlessTape Tape;
-    Program program;
-    const char * CurrentBukva;
-
-    if(!program.InitProgram( MassivChar , ListSize ))
+    else if(ActivFase == 2)
     {
-        Output->setText(program.GetError());
-        ErrorButton->setText("MineCrush");
-
-        for(int i = 0; i < ListSize; i++)
-            delete [] MassivChar[i];
-
-        delete []MassivChar;
-
-        return;
-    }
-    Tape = temp.toStdString().c_str();
-    ErrorButton->setText("Error");
-    while(!program.IsHalted())
-    {
-
-        CurrentBukva = Tape.GetCurrentSymbol();
-        if(!program.Execute(Tape))
-        {
-            Output->setText(program.GetError());
-            ErrorButton->setText("MineCrush");
-            break;
-        }
-        if(x < 0)
-        {
-            temp.prepend(*CurrentBukva);
-            x = 0;
-        }
-        else if(x > temp.size())
-        {
-            temp.append(*CurrentBukva);
-        }
-        else
-            temp[x] = (*CurrentBukva);
-
-        x += Tape.GetLastShift();
-        Output->setText(temp);
+        Start->setText("Начать");
+        ActivFase = 1;
+        Start->setEnabled(false);
+        Pause->setEnabled(true);
+        Step->setEnabled(false);
     }
 }
 
@@ -212,5 +261,37 @@ void CustomPlainText::lineNumberAreaPaintEvent(QPaintEvent *event)
 }
 
 
+void MyDialog::on_FullSpeed_clicked()
+{
+    if(b_FullSpeed)
+        b_FullSpeed = false;
+    else
+        b_FullSpeed = true;
+}
 
+void MyDialog::on_Pause_clicked()
+{
+    ActivFase = 2;
+    Start->setText("Продолжить");
+    Pause->setEnabled(false);
+    Start->setEnabled(true);
+    Step->setEnabled(true);
+}
 
+void MyDialog::on_Reset_clicked()
+{
+    QString temp = Input->text();
+    Output->repaint();
+    Output->setText(temp);
+    ActivFase = 0;
+    Start->setEnabled(true);
+    Start->setText("Начать");
+    Step->setEnabled(false);
+    b_Reset = true;
+}
+
+void MyDialog::on_Step_clicked()
+{
+    Pause->setEnabled(false);
+    ActivFase = 3;
+}

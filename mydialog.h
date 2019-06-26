@@ -3,8 +3,8 @@
 
 #include "customplaintext.h"
 #include "ui_mydialog.h"
-#include "TuringMashine/EndlessTape.h"
-#include "TuringMashine/Program.h"
+#include "EndlessTape.h"
+#include "Program.h"
 #include <QFile>
 #include <QString>
 #include <QTextStream>
@@ -20,13 +20,14 @@
 
 using namespace std;
 
+
 class MyDialog : public QDialog, public Ui::Dialog
 {
     Q_OBJECT
 
 public:
     explicit MyDialog(QWidget *parent = nullptr);
-
+    void Proccess();
 
 private:
     QWidget *lineNumberArea;
@@ -34,6 +35,10 @@ private:
 
 private slots:
     void on_Start_clicked();
+    void on_FullSpeed_clicked();
+    void on_Pause_clicked();
+    void on_Reset_clicked();
+    void on_Step_clicked();
 };
 
 
