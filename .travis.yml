@@ -9,7 +9,6 @@ os:
     - os
     
 script:
-    - mkdir build
     - cd build
     - ctest --output-on-failure
     - qmake -project
