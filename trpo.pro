@@ -40,11 +40,3 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-test: bin/tests
-
-bin/tests: build/test/main.o
-	gcc -Wall -Werror build/test/main.o -o bin/tests
-
-build/test/main.o: test/main.c
-	gcc -Wall -Werror -c -I CTest -I src test/main.c -o build/test/main.o
