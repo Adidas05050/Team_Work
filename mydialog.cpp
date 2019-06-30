@@ -6,19 +6,24 @@ bool b_FullSpeed = false;
 bool b_Reset = false;
 void MyDialog::Proccess()
 {
-    Start->setEnabled(false);
+    Start->setText("Продолжить");
     QFile file("text.txt");
     QTextStream writeStream(&file);
     file.open(QIODevice::WriteOnly | QIODevice::Text);
 
     QString temp = Input->text();
     Output->setText(temp);
-
+    Output->setSelection(0,1);
     QString to_file = plainTextEdit->toPlainText();
     QStringList strList = to_file.split(QRegExp("[\n]"));
     writeStream << to_file << endl;
     file.close();// first stade
 
+    if(to_file.isEmpty())
+    {
+        ErrorLine->setText("Code is empty.");
+        return;
+    }
     string code;
     string memory;
     size_t dlina_stroki;
@@ -38,7 +43,7 @@ void MyDialog::Proccess()
     EndlessTape Tape;
     Program program;
     const char * CurrentBukva;
-
+    Output->setSelection(x,1);
     if(!program.InitProgram( MassivChar , ListSize ))
     {
         ErrorLine->setText(program.GetError());
@@ -68,7 +73,7 @@ void MyDialog::Proccess()
         {
             QEventLoop loop;
             QTimer timer;
-            timer.setInterval(300);
+            timer.setInterval(50);
             connect (&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
             timer.start();
             loop.exec();
@@ -93,9 +98,12 @@ void MyDialog::Proccess()
         else
             temp[x] = (*CurrentBukva);
 
-        x += Tape.GetLastShift();
         Output->setText(temp);
         Output->setSelection(x,1);
+        x += Tape.GetLastShift();
+
+
+
         if(ActivFase == 3)
             ActivFase = 2;
     }
@@ -103,6 +111,7 @@ void MyDialog::Proccess()
     {
         Pause->setEnabled(false);
         Start->setEnabled(false);
+        Step->setEnabled(false);
     }
 }
 
@@ -134,27 +143,11 @@ MyDialog::MyDialog(QWidget *parent) : QDialog (parent)
     setupUi(this);
     Output->setEnabled(false);
     Output->setStyleSheet("QLineEdit { selection-background-color: rgb(150, 150, 00); }");
+    Output->setSelection(0,1);
 }
 
 
-void MyDialog::on_Start_clicked()
-{
-    if(ActivFase == 0)
-    {
-        ActivFase = 1;
-        Pause->setEnabled(true);
-        b_Reset = false;
-        Proccess();
-    }
-    else if(ActivFase == 2)
-    {
-        Start->setText("Начать");
-        ActivFase = 1;
-        Start->setEnabled(false);
-        Pause->setEnabled(true);
-        Step->setEnabled(false);
-    }
-}
+
 
 int CustomPlainText::lineNumberAreaWidth()
 {
@@ -260,6 +253,30 @@ void CustomPlainText::lineNumberAreaPaintEvent(QPaintEvent *event)
     }
 }
 
+void MyDialog::on_Start_clicked()
+{
+    if(ActivFase == 0)
+    {
+        ActivFase = 3;
+        Pause->setEnabled(true);
+        b_Reset = false;
+        Proccess();
+    }
+    else if(ActivFase == 2)
+    {
+        Start->setText("Начать");
+        ActivFase = 1;
+        Start->setEnabled(false);
+        Pause->setEnabled(true);
+    }
+    else if(ActivFase == 3)
+    {
+        Start->setText("Начать");
+        ActivFase = 1;
+        Start->setEnabled(false);
+        Pause->setEnabled(true);
+    }
+}
 
 void MyDialog::on_FullSpeed_clicked()
 {
@@ -286,12 +303,16 @@ void MyDialog::on_Reset_clicked()
     ActivFase = 0;
     Start->setEnabled(true);
     Start->setText("Начать");
-    Step->setEnabled(false);
+    Step->setEnabled(true);
     b_Reset = true;
+    Output->setSelection(0,1);
+    ErrorLine->clear();
 }
 
 void MyDialog::on_Step_clicked()
 {
+    Start->setText("Продолжить");
+    Start->setEnabled(true);
     Pause->setEnabled(false);
     ActivFase = 3;
 }
