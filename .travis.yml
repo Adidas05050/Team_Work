@@ -10,7 +10,7 @@ os:
     
 script:
     - cd build
-    - qmtest --output-on-failure
+    - сtest --output-on-failure
     - qmake -project "CONFIG += qtestlib"
     - qmake
     - make
