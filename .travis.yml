@@ -13,6 +13,4 @@ script:
     - qmake -project "CONFIG += qtestlib"
     - qmake
     - make
-    - make test
-    - ./bin/tests
     - ctest --output-on-failure
