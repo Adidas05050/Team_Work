@@ -3,8 +3,8 @@
 
 #include "customplaintext.h"
 #include "ui_mydialog.h"
-#include "TuringMashine/EndlessTape.h"
-#include "TuringMashine/Program.h"
+#include "EndlessTape.h"
+#include "Program.h"
 #include <QFile>
 #include <QString>
 #include <QTextStream>
@@ -17,6 +17,10 @@
 #include <QAbstractScrollArea>
 #include <fstream>
 #include <cstring>
+#include <QtGui>
+#include <QtTest/QTest>
+#include "test_qlineedit.h"
+
 
 using namespace std;
 
