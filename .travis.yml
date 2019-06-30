@@ -7,10 +7,11 @@ compiler:
 os:
     - linux
     - os
-
-before_script: 
-
+    
 script:
     - mkdir build
     - cd build
     - ctest --output-on-failure
+    - qmake -Project
+    - qmake trpo.pro 
+    - make
