@@ -11,3 +11,6 @@ os:
 script:
     - cd build
     - ctest --output-on-failure
+    - qmake -project "CONFIG += qtestlib"
+    - qmake
+    - make
