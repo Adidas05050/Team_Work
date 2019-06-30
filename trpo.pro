@@ -26,9 +26,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+    TuringMashine/*.cpp \
     *.cpp
 
 HEADERS += \
+    TuringMashine/*.h \
     *.h
 
 FORMS += \
