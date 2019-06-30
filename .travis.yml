@@ -1,6 +1,7 @@
-language: cpp
-
+os: linux
 dist: xenial
+language: cpp
+compiler: gcc
 
 before_install:
  - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
