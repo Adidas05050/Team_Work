@@ -9,9 +9,6 @@ os:
     - os
     
 script:
+    - mkdir build
     - cd build
     - ctest --output-on-failure
-    - cd ..
-    - qmake -project
-    - qmake trpo.pro 
-    - make
