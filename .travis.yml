@@ -11,6 +11,7 @@ os:
 script:
     - cd build
     - ctest --output-on-failure
+    - cd ..
     - qmake -project
     - qmake trpo.pro 
     - make
