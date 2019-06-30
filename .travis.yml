@@ -12,6 +12,6 @@ script:
     - mkdir build
     - cd build
     - ctest --output-on-failure
-    - qmake -Project
+    - qmake -project
     - qmake trpo.pro 
     - make
