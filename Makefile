@@ -13,8 +13,6 @@ $(EXECUTABLE) : $(OBJECTS)
 build/src/%.o : src/%.cpp
 	$(CC) $(CFLAGS) $< -o $@ -std=c++11
 
-.PHONY : test
-
 test: bin/tests
 
 bin/bin/tests: build/test/main.o build/test/EndlessTape.o build/test/Program.o

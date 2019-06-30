@@ -14,5 +14,5 @@ script:
     - qmake
     - make
     - make test
-    - ./tests
+    - ./bin/tests
     - ctest --output-on-failure
