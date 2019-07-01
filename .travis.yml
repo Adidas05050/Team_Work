@@ -9,11 +9,12 @@ os:
     - os
     
 script:
+    - ./build_test.sh
+    - ./travis_qmake_gcc_cpp98_qt_qtest_test
+    - ./build_normal.sh
     - cd build
     - qmake -project "CONFIG += qtestlib"
     - qmake
     - make
-    - ./build_test.sh
-    - ./travis_qmake_gcc_cpp98_qt_qtest_test
-    - ./build_normal.sh
+    
 
