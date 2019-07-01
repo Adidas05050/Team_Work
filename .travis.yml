@@ -14,6 +14,6 @@ services:
 #  - sleep 3 # give xvfb some time to start
 
 script: 
- - ./build_test.sh
- - ./travis_qmake_gcc_cpp98_qt_qtest_test
- - ./build_normal.sh
+ - build_test.sh
+ - travis_qmake_gcc_cpp98_qt_qtest_test
+ - build_normal.sh
