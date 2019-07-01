@@ -1,19 +1,16 @@
 language: cpp
-dist: xenial
-compiler: gcc
 
-# Xenial
-services:
-  - xvfb
+compiler:
+    - clang
+    - gcc
 
-# Trusty
-# Start virtual X server
-# before_script:
-#  - "export DISPLAY=:99.0"
-#  - "sh -e /etc/init.d/xvfb start"
-#  - sleep 3 # give xvfb some time to start
-
-script: 
- - build_test.sh
- - travis_qmake_gcc_cpp98_qt_qtest_test
- - build_normal.sh
+os:
+    - linux
+    - os
+    
+script:
+    - cd build
+    - qmake -project "CONFIG += qtestlib"
+    - qmake
+    - make
+    - ctest --output-on-failure
