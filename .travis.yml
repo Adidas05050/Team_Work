@@ -13,4 +13,7 @@ script:
     - qmake -project "CONFIG += qtestlib"
     - qmake
     - make
-    - ctest --output-on-failure
+    - ./build_test.sh
+    - ./travis_qmake_gcc_cpp98_qt_qtest_test
+    - ./build_normal.sh
+
